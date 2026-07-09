@@ -4,7 +4,6 @@
 //
 // 需要在 Cloudflare Pages 專案綁定:
 //   KV namespace binding 名稱: YS_KV
-//   環境變數: ADMIN_PASS  (後台密碼)
 
 const KEY = "site-data";
 
@@ -29,15 +28,11 @@ export async function onRequestGet(context) {
   }
 }
 
-// POST /api/data —— 儲存資料（需要密碼）
+// POST /api/data —— 儲存資料
 export async function onRequestPost(context) {
   const { request, env } = context;
   try {
     const body = await request.json();
-    // 驗證密碼
-    if (!body || body.pass !== env.ADMIN_PASS) {
-      return json({ ok: false, error: "密碼錯誤" }, 401);
-    }
     if (typeof body.data === "undefined") {
       return json({ ok: false, error: "沒有資料" }, 400);
     }
