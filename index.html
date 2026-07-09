@@ -637,7 +637,7 @@
 <div id="adminPanel">
   <div class="ap-head"><h2>後台管理</h2><button class="x" onclick="closeAdmin()">×</button></div>
   <div class="ap-body" id="adminBody"></div>
-  <div class="ap-actions"><button class="a-save" onclick="saveData()">儲存</button><button class="a-export" onclick="exportSite()">下載完整網站</button><button class="a-export" onclick="backupJSON()">備份資料</button><label class="a-export" style="display:flex;align-items:center;justify-content:center;cursor:pointer;">匯入資料<input type="file" accept=".json,application/json" style="display:none" onchange="importJSON(event)"></label><button class="a-reset" onclick="resetData()">重設</button></div>
+  <div class="ap-actions"><button class="a-save" onclick="saveData()">儲存並更新網站</button><button class="a-export" onclick="exportSite()">下載並前往更新</button><button class="a-export" onclick="backupJSON()">備份資料</button><label class="a-export" style="display:flex;align-items:center;justify-content:center;cursor:pointer;">匯入資料<input type="file" accept=".json,application/json" style="display:none" onchange="importJSON(event)"></label><button class="a-reset" onclick="resetData()">重設</button></div>
 </div>
 <div id="toast"></div>
 <script>
@@ -1528,10 +1528,35 @@ function collect(){
   d.social={ line:v("soc_line"), fb:v("soc_fb"), ig:v("soc_ig") };
   return d;
 }
+let SAVE_PASS = "";
 async function saveData(){
   DATA=collect(); renderSite();
-  try{ if(window.storage){ await window.storage.set("yangsheng-site-v13", JSON.stringify(DATA), true); toast("已儲存（雲端）"); } else { toast("已更新，請用「下載完整網站」保存"); } }
-  catch(e){ toast("已更新預覽"); }
+  // 儲存密碼只在記憶體暫存，不寫進網站檔案
+  if(!SAVE_PASS){
+    const p = prompt("請輸入儲存密碼（第一次儲存需輸入，之後這次登入不用再輸）：");
+    if(p===null) return;
+    SAVE_PASS = p;
+  }
+  const btn=document.querySelector(".a-save");
+  const oldTxt=btn?btn.textContent:"";
+  if(btn){ btn.textContent="儲存中…"; btn.disabled=true; }
+  try{
+    const res=await fetch("/api/data",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({ pass: SAVE_PASS, data: DATA })
+    });
+    const r=await res.json();
+    if(r.ok){
+      toast("✅ 已儲存，網站已更新！");
+    } else {
+      if(res.status===401){ SAVE_PASS=""; toast("儲存密碼錯誤，請重試"); }
+      else toast("儲存失敗："+(r.error||"未知錯誤"));
+    }
+  }catch(e){
+    toast("儲存失敗，請檢查網路："+String(e));
+  }
+  if(btn){ btn.textContent=oldTxt||"儲存"; btn.disabled=false; }
 }
 function resetData(){ if(!confirm("確定還原成預設內容嗎？")) return; DATA=JSON.parse(JSON.stringify(DEFAULT_DATA)); renderSite(); buildAdmin(); toast("已還原預設"); }
 function exportSite(){
@@ -1541,13 +1566,33 @@ function exportSite(){
   html=html.replace(/\/\*__DATA_START__\*\/[\s\S]*?\/\*__DATA_END__\*\//,"/*__DATA_START__*/\n"+baked+"\n/*__DATA_END__*/");
   const blob=new Blob([html],{type:"text/html;charset=utf-8"});
   const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="index.html";
-  document.body.appendChild(a); a.click(); a.remove(); toast("已下載完整網站檔");
+  document.body.appendChild(a); a.click(); a.remove();
+  toast("✅ 已下載 index.html");
+  setTimeout(function(){
+    if(confirm("檔案已下載完成！\n\n要前往 GitHub 上傳更新網站嗎？\n\n（按確定會打開 GitHub 上傳頁，把剛下載的 index.html 拖進去即可）")){
+      window.open("https://github.com/yangshengmobile178178/yangsheng-web/upload/main","_blank");
+    }
+  },600);
 }
 let toastT;
 function toast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("show"),2200);}
 
 (async function(){
-  try{ if(window.storage){ const r=await window.storage.get("yangsheng-site-v13", true); if(r&&r.value) DATA=JSON.parse(r.value); } }catch(e){}
+  try{
+    const res = await fetch("/api/data", { cache: "no-store" });
+    if(res.ok){
+      const txt = await res.text();
+      const parsed = JSON.parse(txt);
+      // API 可能回傳 {ok:true,data:null} 或直接回傳資料物件
+      if(parsed && parsed.ok === true && parsed.data === null){
+        // 資料庫還沒資料，用內建預設
+      } else if(parsed && typeof parsed === "object" && !("ok" in parsed)){
+        DATA = parsed;
+      } else if(parsed && parsed.data){
+        DATA = parsed.data;
+      }
+    }
+  }catch(e){ /* 讀取失敗就用內建預設，網站仍可顯示 */ }
   renderSite();
 })();
 
