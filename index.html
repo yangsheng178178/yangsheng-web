@@ -309,7 +309,8 @@
   }
   .ap-actions{padding:16px 22px;border-top:1px solid #e2ddd0;display:flex;gap:10px;background:#f3f1ec;flex-wrap:wrap;}
   .ap-actions button{flex:1;min-width:110px;border:none;border-radius:6px;padding:12px;font-size:13px;font-weight:700;font-family:'Noto Sans TC';cursor:pointer;}
-  .a-save{background:var(--signal);color:#fff;} .a-export{background:#e8e4d8;color:#2a2f38;} .a-reset{background:transparent;color:#9aa0ab;flex:none;min-width:auto;padding:12px 8px;}
+  .a-save{background:var(--signal);color:#fff;}
+  .ap-actions .a-save{flex:1;max-width:400px;margin:0 auto;padding:15px;font-size:15px;} .a-export{background:#e8e4d8;color:#2a2f38;} .a-reset{background:transparent;color:#9aa0ab;flex:none;min-width:auto;padding:12px 8px;}
   .ap-sec{margin-bottom:24px;}
   .ap-sec>h3{font-size:12px;font-weight:700;letter-spacing:0.08em;color:var(--signal);text-transform:uppercase;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.08);}
   .fld{margin-bottom:12px;} .fld label{display:block;font-size:12px;color:#9aa0ab;margin-bottom:5px;}
@@ -637,7 +638,7 @@
 <div id="adminPanel">
   <div class="ap-head"><h2>後台管理</h2><button class="x" onclick="closeAdmin()">×</button></div>
   <div class="ap-body" id="adminBody"></div>
-  <div class="ap-actions"><button class="a-save" onclick="saveData()">儲存並更新網站</button><button class="a-export" onclick="exportSite()">下載並前往更新</button><button class="a-export" onclick="backupJSON()">備份資料</button><label class="a-export" style="display:flex;align-items:center;justify-content:center;cursor:pointer;">匯入資料<input type="file" accept=".json,application/json" style="display:none" onchange="importJSON(event)"></label><button class="a-reset" onclick="resetData()">重設</button></div>
+  <div class="ap-actions"><button class="a-save" onclick="saveData()">儲存並更新網站</button></div>
 </div>
 <div id="toast"></div>
 <script>
@@ -1528,15 +1529,8 @@ function collect(){
   d.social={ line:v("soc_line"), fb:v("soc_fb"), ig:v("soc_ig") };
   return d;
 }
-let SAVE_PASS = "";
 async function saveData(){
   DATA=collect(); renderSite();
-  // 儲存密碼只在記憶體暫存，不寫進網站檔案
-  if(!SAVE_PASS){
-    const p = prompt("請輸入儲存密碼（第一次儲存需輸入，之後這次登入不用再輸）：");
-    if(p===null) return;
-    SAVE_PASS = p;
-  }
   const btn=document.querySelector(".a-save");
   const oldTxt=btn?btn.textContent:"";
   if(btn){ btn.textContent="儲存中…"; btn.disabled=true; }
@@ -1544,19 +1538,18 @@ async function saveData(){
     const res=await fetch("/api/data",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({ pass: SAVE_PASS, data: DATA })
+      body:JSON.stringify({ data: DATA })
     });
     const r=await res.json();
     if(r.ok){
       toast("✅ 已儲存，網站已更新！");
     } else {
-      if(res.status===401){ SAVE_PASS=""; toast("儲存密碼錯誤，請重試"); }
-      else toast("儲存失敗："+(r.error||"未知錯誤"));
+      toast("儲存失敗："+(r.error||"未知錯誤"));
     }
   }catch(e){
     toast("儲存失敗，請檢查網路："+String(e));
   }
-  if(btn){ btn.textContent=oldTxt||"儲存"; btn.disabled=false; }
+  if(btn){ btn.textContent=oldTxt||"儲存並更新網站"; btn.disabled=false; }
 }
 function resetData(){ if(!confirm("確定還原成預設內容嗎？")) return; DATA=JSON.parse(JSON.stringify(DEFAULT_DATA)); renderSite(); buildAdmin(); toast("已還原預設"); }
 function exportSite(){
