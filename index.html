@@ -823,8 +823,8 @@ const DEFAULT_DATA = {
       g5:[["優惠方案 599","24/30","5G 24GB，超量4G 12Mbps吃到飽","網內前5分免費、網外30分、市話40分","$3000/$3500","請洽門市"],["優惠方案 799","24/30","5G 36GB，超量4G 21Mbps吃到飽","網內前10分免費、網外45分、市話60分","$4800/$6000","請洽門市"],["優惠方案 999","24/30/36","5G 60GB，超量4G上網吃到飽","網內免費、網外60分、市話75分","$6500/$8500/$11300","請洽門市"],["優惠方案 1199","24/30","5G 100GB，超量4G上網吃到飽","網內免費、網外80分、市話100分","$8000/$10000","請洽門市"],["優惠方案 1399","24/30/36","5G 上網吃到飽不降速","網內免費、網外110分、市話140分","$10200/$13000/$15000","請洽門市"]] }
   ],
   stores:[
-    { name:"揚紳通訊・二苓店", address:"高雄市小港區二苓路178號", phone:"07-8012625", email:"yangsheng178178@gmail.com", hours:"周一至周六 11:30–21:30｜周日 11:30–17:00" },
-    { name:"揚紳通訊・桂林店", address:"高雄市小港區桂華街26號", phone:"0963501379", email:"yangsheng178178@gmail.com", hours:"周一至周六 11:30–21:30｜周日 11:30–17:00" }
+    { name:"揚紳通訊・二苓店", address:"高雄市小港區二苓路178號", phone:"07-8012625", email:"yangsheng178178@gmail.com", hours:"周一至周六 11:30–21:30｜周日 11:30–17:00", closed:"每月公休日請洽門市" },
+    { name:"揚紳通訊・桂林店", address:"高雄市小港區桂華街26號", phone:"0963501379", email:"yangsheng178178@gmail.com", hours:"周一至周六 11:30–21:30｜周日 11:30–17:00", closed:"每月公休日請洽門市" }
   ],
   social:{ line:"https://line.me/R/ti/p/@253gkflo?oat_content=url&ts=08191636", fb:"https://www.facebook.com/yangsheng178/?locale=zh_TW", ig:"https://www.instagram.com/yangsheng178178" }
 };
@@ -1108,6 +1108,7 @@ function pageContact(){
           <div class="ci-row"><span class="k">電話</span><span class="v"><a href="${telHref(s.phone)}">${esc(s.phone)}</a></span></div>
           <div class="ci-row"><span class="k">E-mail</span><span class="v">${esc(s.email)}</span></div>
           <div class="ci-row"><span class="k">營業時間</span><span class="v">${esc(s.hours)}</span></div>
+          ${s.closed?`<div class="ci-row"><span class="k">每月公休</span><span class="v">${esc(s.closed)}</span></div>`:""}
         </div>
         <div class="map-block"><iframe loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=${encodeURIComponent(s.address)}&output=embed" title="${esc(s.name)} 地圖"></iframe></div>
       </div>`).join("")}
@@ -1475,9 +1476,9 @@ function buildAdmin(){
 
     ${apAcc("門市資訊", `
       <div class="fld"><label>門市一</label></div>
-      ${fld("店名","s0_name",d.stores[0].name)}${fld("地址","s0_addr",d.stores[0].address,"首頁地圖依此地址定位")}${fld("電話","s0_phone",d.stores[0].phone)}${fld("E-mail","s0_email",d.stores[0].email)}${fld("營業時間","s0_hours",d.stores[0].hours)}
+      ${fld("店名","s0_name",d.stores[0].name)}${fld("地址","s0_addr",d.stores[0].address,"首頁地圖依此地址定位")}${fld("電話","s0_phone",d.stores[0].phone)}${fld("E-mail","s0_email",d.stores[0].email)}${fld("營業時間","s0_hours",d.stores[0].hours)}${fld("每月公休","s0_closed",d.stores[0].closed||"")}
       <div class="fld" style="margin-top:12px;"><label>門市二</label></div>
-      ${fld("店名","s1_name",d.stores[1].name)}${fld("地址","s1_addr",d.stores[1].address)}${fld("電話","s1_phone",d.stores[1].phone)}${fld("E-mail","s1_email",d.stores[1].email)}${fld("營業時間","s1_hours",d.stores[1].hours)}`)}
+      ${fld("店名","s1_name",d.stores[1].name)}${fld("地址","s1_addr",d.stores[1].address)}${fld("電話","s1_phone",d.stores[1].phone)}${fld("E-mail","s1_email",d.stores[1].email)}${fld("營業時間","s1_hours",d.stores[1].hours)}${fld("每月公休","s1_closed",d.stores[1].closed||"")}`)}
 
     ${apAcc("社群連結(頁尾圖示)", `
       ${fld("LINE 網址","soc_line",(d.social||{}).line||"","例如 https://line.me/R/ti/p/@你的ID")}
@@ -1524,8 +1525,8 @@ function collect(){
   })).filter(s=>s.t);
   d.wraps=textToArr(v("f_wraps")); d.banners=textToArr(v("f_banners")); d.recycleFoot=v("f_recfoot");
   d.newBrands=textToArr(v("f_newbrands")); d.usedSeries=textToArr(v("f_usedseries"));
-  d.stores[0]={name:v("s0_name"),address:v("s0_addr"),phone:v("s0_phone"),email:v("s0_email"),hours:v("s0_hours")};
-  d.stores[1]={name:v("s1_name"),address:v("s1_addr"),phone:v("s1_phone"),email:v("s1_email"),hours:v("s1_hours")};
+  d.stores[0]={name:v("s0_name"),address:v("s0_addr"),phone:v("s0_phone"),email:v("s0_email"),hours:v("s0_hours"),closed:v("s0_closed")};
+  d.stores[1]={name:v("s1_name"),address:v("s1_addr"),phone:v("s1_phone"),email:v("s1_email"),hours:v("s1_hours"),closed:v("s1_closed")};
   d.hero.eyebrow=v("h_eyebrow"); d.hero.titleA=v("h_ta"); d.hero.titleEm=v("h_em"); d.hero.titleB=v("h_tb"); d.hero.desc=v("h_desc");
   d.hero.p1tag=v("h_p1t"); d.hero.p1big=v("h_p1b"); d.hero.p1note=v("h_p1n");
   d.hero.p2tag=v("h_p2t"); d.hero.p2big=v("h_p2b"); d.hero.p2note=v("h_p2n");
