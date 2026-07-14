@@ -343,6 +343,7 @@
   .row-edit .del{background:#e5484d;border:none;color:#fff;border-radius:5px;padding:8px 15px;cursor:pointer;font-size:12.5px;font-weight:700;flex:none;transition:background .15s;}
   .row-edit .del:hover{background:#c93a3f;}
   .addrow{width:100%;background:rgba(191,140,66,.14);border:1.5px solid var(--signal);color:var(--signal);border-radius:7px;padding:12px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC';margin-top:6px;transition:background .15s,color .15s;}
+  .addrow-top{margin-top:2px;margin-bottom:10px;}
   .addrow:hover{background:var(--signal);color:#fff;}
   .ap-note{font-size:11.5px;color:#7b828e;line-height:1.6;background:#f7f6f2;border:1px solid #f3f1ec;border-radius:6px;padding:11px 12px;margin-bottom:18px;}
   #toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 22px;border-radius:50px;font-size:13px;font-weight:600;z-index:100;opacity:0;transition:all .3s;pointer-events:none;}
@@ -1293,8 +1294,8 @@ function rowPlan(vals){
 function grpPrice(g){
   return `<div class="grp"><div class="grp-head"><input class="g-name" value="${esc(g.brand||"")}" placeholder="品牌名稱"><button class="mv" title="整組上移" onclick="moveUp(this)">↑</button><button class="grp-del" onclick="if(confirm('刪除整組?'))this.closest('.grp').remove()">刪整組</button></div>
     <div class="fld"><label>備註(可空白)</label><input class="g-note" value="${esc(g.note||"")}"></div>
-    <div class="g-rows">${(g.rows||[]).map(r=>row2(r[0],r[1],"商品名稱","售價")).join("")}</div>
-    <button class="addrow" onclick="this.previousElementSibling.insertAdjacentHTML('beforeend', row2('','','商品名稱','售價'))">＋ 新增商品</button></div>`;
+    <button class="addrow addrow-top" onclick="(function(b){b.nextElementSibling.insertAdjacentHTML('afterbegin', row2('','','商品名稱','售價'));var f=b.nextElementSibling.querySelector('.v0');if(f)f.focus();})(this)">＋ 新增商品</button>
+    <div class="g-rows">${(g.rows||[]).map(r=>row2(r[0],r[1],"商品名稱","售價")).join("")}</div></div>`;
 }
 function grpRecycle(g){
   return `<div class="grp"><div class="grp-head"><input class="g-name" value="${esc(g.brand||"")}" placeholder="分類名稱"><button class="mv" title="整組上移" onclick="moveUp(this)">↑</button><button class="grp-del" onclick="if(confirm('刪除整組?'))this.closest('.grp').remove()">刪整組</button></div>
