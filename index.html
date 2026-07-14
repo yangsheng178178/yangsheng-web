@@ -1232,7 +1232,7 @@ function closeAdmin(){
 }
 function closeAdmin(){document.getElementById("adminMask").style.display="none";document.getElementById("adminPanel").classList.remove("open");}
 function fld(label,id,val,hint,ta){const f=ta?`<textarea id="${id}">${esc(val)}</textarea>`:`<input id="${id}" value="${esc(val)}">`;return `<div class="fld"><label>${label}</label>${f}${hint?`<div class="hint">${hint}</div>`:""}</div>`;}
-function row2(a,b,pa,pb){return `<div class="row-edit"><div class="ge"><input class="v0" value="${esc(a)}" placeholder="${pa}"><input class="v1" value="${esc(b)}" placeholder="${pb}"><button class="mv" title="上移" onclick="moveUp(this)">↑</button><button class="del" onclick="this.closest('.row-edit').remove()">刪除</button></div></div>`;}
+function row2(a,b,pa,pb){return `<div class="row-edit"><div class="ge"><input class="v0 kbnav" value="${esc(a)}" placeholder="${pa}"><input class="v1 kbnav price-input" value="${esc(b)}" placeholder="${pb}" inputmode="numeric"><button class="mv" title="上移" onclick="moveUp(this)">↑</button><button class="del" onclick="this.closest('.row-edit').remove()">刪除</button></div></div>`;}
 function row3(a,b,c,pa,pb,pc){return `<div class="row-edit"><div class="ge"><input class="v0" value="${esc(a)}" placeholder="${pa}"></div><div class="ge"><input class="v1" value="${esc(b)}" placeholder="${pb}"><input class="v2" value="${esc(c)}" placeholder="${pc}"><button class="mv" title="上移" onclick="moveUp(this)">↑</button><button class="del" onclick="this.closest('.row-edit').remove()">刪除</button></div></div>`;}
 function logoPreviewHTML(){
   const l=(DATA.brand.logo||"");
@@ -1697,6 +1697,39 @@ window.addEventListener("scroll",function(){
 },{passive:true});
 
 /* ===== 後台優化:搜尋、排序、未儲存提醒、備份還原 ===== */
+/* 價格欄自動格式化($與千分位) + 方向鍵上下跳格 */
+function formatPriceInput(inp){
+  let raw = inp.value.replace(/[^0-9]/g,""); // 只留數字
+  if(raw===""){ inp.value=""; return; }
+  const n = parseInt(raw,10);
+  inp.value = "$" + n.toLocaleString("en-US"); // 加$與千分位
+}
+document.addEventListener("input", function(e){
+  const t = e.target;
+  if(t && t.classList && t.classList.contains("price-input")){
+    // 記住游標位置概念:格式化後移到最後(數字輸入通常在末端)
+    formatPriceInput(t);
+  }
+});
+document.addEventListener("keydown", function(e){
+  const t = e.target;
+  if(!t || !t.classList || !t.classList.contains("kbnav")) return;
+  if(e.key!=="ArrowDown" && e.key!=="ArrowUp") return;
+  e.preventDefault();
+  // 找出所有同類輸入框(依欄位:v0 或 v1)
+  const isPrice = t.classList.contains("v1");
+  const selector = isPrice ? "input.v1.kbnav" : "input.v0.kbnav";
+  // 限定在同一個編輯區塊(同一個 accordion)內
+  const scope = t.closest(".ap-body") || document;
+  const list = Array.from(scope.querySelectorAll(selector));
+  const idx = list.indexOf(t);
+  if(idx===-1) return;
+  let next = e.key==="ArrowDown" ? idx+1 : idx-1;
+  if(next<0) next=0;
+  if(next>=list.length) next=list.length-1;
+  const target = list[next];
+  if(target){ target.focus(); target.select && target.select(); }
+});
 function moveUp(btn){
   const node = btn.closest(".grp-head") ? btn.closest(".grp") : btn.closest(".row-edit");
   if(!node) return;
