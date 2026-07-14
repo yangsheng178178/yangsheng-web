@@ -215,6 +215,21 @@
   table.dt tr:hover td{background:var(--signal-dim);}
   table.dt tr:hover td:first-child{box-shadow:inset 3px 0 0 var(--signal);}
   .table-note{font-size:12.5px;color:var(--ink-soft);margin-top:12px;}
+  .recycle-notice{background:var(--signal-dim);border-left:4px solid var(--signal);border-radius:0 8px 8px 0;padding:14px 18px;margin:14px 0 18px;font-size:14px;line-height:1.7;color:var(--ink);font-weight:600;}
+  @media(max-width:600px){.recycle-notice{font-size:13px;padding:12px 14px;}}
+  .recycle-block{margin:0 0 40px;}
+  .repair-android-note{background:var(--paper-dim);border-left:4px solid var(--signal);border-radius:0 8px 8px 0;padding:16px 20px;font-size:15px;line-height:1.9;color:var(--ink);font-weight:500;}
+  @media(max-width:600px){.repair-android-note{font-size:14px;padding:14px 16px;}}
+  .rc-head{display:flex;align-items:center;gap:14px;padding:15px 20px;background:var(--signal-dim);border:1px solid var(--signal);border-radius:12px;margin-bottom:18px;}
+  .rc-icon{font-size:28px;flex:none;line-height:1;}
+  .rc-title{font-size:22px;font-weight:800;color:var(--ink);margin:0;letter-spacing:.02em;}
+  .rc-sub{font-size:13px;color:var(--signal);margin:3px 0 0;font-weight:700;}
+  @media(max-width:600px){
+    .rc-head{padding:14px 16px;gap:11px;}
+    .rc-icon{font-size:24px;}
+    .rc-title{font-size:19px;}
+    .rc-sub{font-size:12px;}
+  }
   details.acc{border:1px solid var(--line);margin-bottom:8px;background:var(--paper);}
   details.acc>summary{padding:15px 20px;font-weight:700;font-size:14.5px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;}
   details.acc>summary::-webkit-details-marker{display:none;}
@@ -1019,12 +1034,18 @@ function pageRepair(){
     ${crumb("維修報價")}
     <div class="section-head"><div><span class="section-num">04 — 維修報價</span><h2 class="section-title">iPhone・iPad 維修</h2></div>
       <p class="section-desc">維修前現場檢測報價，確認金額才施工。點各系列展開價目表。</p></div>
-    <div class="sub-label">iPhone 系列維修</div>
-    ${d.iphoneRepair.map((t,i)=>acc(t.title, dt(t.headers,t.rows,true), i===0)).join("")}
-    <div class="sub-label">iPad 系列維修</div>
-    ${d.ipadRepair.map(t=>acc(t.title, dt(t.headers,t.rows,true), false)).join("")}
-    <div class="sub-label">安卓 Android 維修</div>
-    <p class="table-note" style="font-size:14px;">Android 品牌維修歡迎以電話或到店方式提供報價：檢測異常 → 提供報價 → 快速維修 → 完修交付。</p>
+    <div class="recycle-block">
+      <div class="rc-head"><span class="rc-icon">🍎</span><div><h3 class="rc-title">iPhone 維修</h3><p class="rc-sub">各機型維修價目表</p></div></div>
+      ${d.iphoneRepair.map((t,i)=>acc(t.title, dt(t.headers,t.rows,true), i===0)).join("")}
+    </div>
+    <div class="recycle-block">
+      <div class="rc-head"><span class="rc-icon">📲</span><div><h3 class="rc-title">iPad 維修</h3><p class="rc-sub">平板維修價目表</p></div></div>
+      ${d.ipadRepair.map(t=>acc(t.title, dt(t.headers,t.rows,true), false)).join("")}
+    </div>
+    <div class="recycle-block">
+      <div class="rc-head"><span class="rc-icon">🤖</span><div><h3 class="rc-title">安卓 Android 維修</h3><p class="rc-sub">三星・OPPO・vivo・小米等各廠牌</p></div></div>
+      <p class="repair-android-note">Android 品牌維修歡迎以電話或到店方式提供報價：<br>檢測異常 → 提供報價 → 快速維修 → 完修交付。</p>
+    </div>
     ${backHome()}
   </div></section>`;
 }
@@ -1033,13 +1054,18 @@ function pageRecycle(){
   const d=DATA;
   return `<section class="page-fade" style="border-bottom:none;"><div class="wrap">
     ${crumb("回收價格")}
-    <div class="section-head"><div><span class="section-num">05 — 回收價格</span><h2 class="section-title">新機・二手機高價回收</h2></div>
+    <div class="section-head"><div><span class="section-num">05 — 回收價格</span><h2 class="section-title">全新機 × 二手機 │ 高價回收</h2></div>
       <p class="section-desc">實際以現場檢測為主，機況良好會高收。可換現金或折抵新機。</p></div>
-    <div class="sub-label">新機回收・全新未拆封收購價</div>
-    ${acc("Apple 新機回收價", dt(["全新未拆封","收購價（元）"], d.recycleNewApple), true)}
-    ${acc("Samsung 新機回收價", dt(["全新未拆封","收購價（元）"], d.recycleNewSamsung), false)}
-    <div class="sub-label">二手機回收・依機況現場報價</div>
-    ${d.recycleUsed.map(g=>acc(g.brand, dt(["商品型號","預估折抵價值（元）"], g.rows), false)).join("")}
+    <div class="recycle-block">
+      <div class="rc-head"><span class="rc-icon">📱</span><div><h3 class="rc-title">新機回收</h3><p class="rc-sub">全新未拆封・原封收購價</p></div></div>
+      ${acc("Apple 新機回收價", dt(["全新未拆封","收購價（元）"], d.recycleNewApple), true)}
+      ${acc("Samsung 新機回收價", dt(["全新未拆封","收購價（元）"], d.recycleNewSamsung), false)}
+    </div>
+    <div class="recycle-block">
+      <div class="rc-head"><span class="rc-icon">🔄</span><div><h3 class="rc-title">二手機回收</h3><p class="rc-sub">依機況現場檢測報價</p></div></div>
+      <div class="recycle-notice">💡 本網站二手機回收價僅供參考，實際回收價格將依機況、外觀、功能檢測及市場行情綜合評估，最終報價可能高於或低於預估價格。</div>
+      ${d.recycleUsed.map(g=>acc(g.brand, dt(["商品型號","預估折抵價值（元）"], g.rows), false)).join("")}
+    </div>
     <p class="table-note">${esc(d.recycleFoot)}</p>
     ${backHome()}
   </div></section>`;
