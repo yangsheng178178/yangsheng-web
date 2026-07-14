@@ -1010,8 +1010,6 @@ function pagePricing(){
     ${crumb("新機報價")}
     <div class="section-head"><div><span class="section-num">02 — 新機報價</span><h2 class="section-title">新機・全品牌現貨</h2></div>
       <p class="section-desc">售價依規格與當日庫存為準，即時報價歡迎私訊或來電。</p></div>
-    <div class="sub-label">本週主打・iPhone 17 全系列</div>
-    <div class="model-row" style="--x:0;">${d.newPhones.map(p=>`<div class="model-card" style="background:var(--paper-dim);"><div class="ph">${esc(p.model)}</div><div class="px" style="opacity:.7;">${esc(p.spec)}</div><div class="pr">${esc(p.price)}</div></div>`).join("")}</div>
     <div class="sub-label">全品牌新機售價・點各品牌展開</div>
     ${d.newPrices.map((b,i)=>acc(b.brand, dt(["商品名稱","售價（元）"],b.rows)+(b.note?`<p class="table-note" style="padding:12px 16px;">${esc(b.note)}</p>`:""), i===0)).join("")}
     ${backHome()}
