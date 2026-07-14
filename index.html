@@ -1259,8 +1259,8 @@ function closeAdmin(){
 }
 function closeAdmin(){document.getElementById("adminMask").style.display="none";document.getElementById("adminPanel").classList.remove("open");}
 function fld(label,id,val,hint,ta){const f=ta?`<textarea id="${id}">${esc(val)}</textarea>`:`<input id="${id}" value="${esc(val)}">`;return `<div class="fld"><label>${label}</label>${f}${hint?`<div class="hint">${hint}</div>`:""}</div>`;}
-function row2(a,b,pa,pb){return `<div class="row-edit"><div class="ge"><input class="v0 kbnav" value="${esc(a)}" placeholder="${pa}"><input class="v1 kbnav price-input" value="${esc(b)}" placeholder="${pb}" inputmode="numeric"><button class="mv" title="上移" onclick="moveUp(this)">↑</button><button class="del" onclick="this.closest('.row-edit').remove()">刪除</button></div></div>`;}
-function row3(a,b,c,pa,pb,pc){return `<div class="row-edit"><div class="ge"><input class="v0" value="${esc(a)}" placeholder="${pa}"></div><div class="ge"><input class="v1" value="${esc(b)}" placeholder="${pb}"><input class="v2" value="${esc(c)}" placeholder="${pc}"><button class="mv" title="上移" onclick="moveUp(this)">↑</button><button class="del" onclick="this.closest('.row-edit').remove()">刪除</button></div></div>`;}
+function row2(a,b,pa,pb){return `<div class="row-edit"><div class="ge"><input class="v0 kbnav" value="${esc(a)}" placeholder="${pa}"><input class="v1 kbnav price-input" value="${esc(b)}" placeholder="${pb}" inputmode="numeric"><button class="mv" title="上移" onclick="moveUp(this)">↑</button><button class="mv" title="下移" onclick="moveDown(this)">↓</button><button class="del" onclick="this.closest('.row-edit').remove()">刪除</button></div></div>`;}
+function row3(a,b,c,pa,pb,pc){return `<div class="row-edit"><div class="ge"><input class="v0" value="${esc(a)}" placeholder="${pa}"></div><div class="ge"><input class="v1" value="${esc(b)}" placeholder="${pb}"><input class="v2" value="${esc(c)}" placeholder="${pc}"><button class="mv" title="上移" onclick="moveUp(this)">↑</button><button class="mv" title="下移" onclick="moveDown(this)">↓</button><button class="del" onclick="this.closest('.row-edit').remove()">刪除</button></div></div>`;}
 function logoPreviewHTML(){
   const l=(DATA.brand.logo||"");
   if(l) return `<div style="display:flex;align-items:center;gap:10px;margin-top:8px;"><img src="${esc(l)}" style="max-height:40px;max-width:160px;background:#fff;padding:4px;border-radius:4px;"><button class="del" style="padding:8px 12px;" onclick="removeLogo()">移除</button></div>`;
@@ -1280,7 +1280,7 @@ function apAcc(title, inner, open){ return `<details class="ap-acc"${open?" open
 
 function rowRep(vals, headers){
   const prices = headers.slice(1).map((h,i)=>`<input class="v${i+1}" value="${esc((vals||[])[i+1]||"")}" placeholder="${esc(h||("欄"+(i+2)))}">`).join("");
-  return `<div class="row-edit"><div class="ge"><input class="v0" value="${esc((vals||[])[0]||"")}" placeholder="${esc(headers[0]||"項目")}"></div><div class="ge">${prices}<button class="mv" title="上移" onclick="moveUp(this)">↑</button><button class="del" onclick="this.closest('.row-edit').remove()">刪除</button></div></div>`;
+  return `<div class="row-edit"><div class="ge"><input class="v0" value="${esc((vals||[])[0]||"")}" placeholder="${esc(headers[0]||"項目")}"></div><div class="ge">${prices}<button class="mv" title="上移" onclick="moveUp(this)">↑</button><button class="mv" title="下移" onclick="moveDown(this)">↓</button><button class="del" onclick="this.closest('.row-edit').remove()">刪除</button></div></div>`;
 }
 function rowPlan(vals){
   const v=vals||[]; 
@@ -1288,17 +1288,17 @@ function rowPlan(vals){
     <div class="ge"><input class="v0" value="${esc(v[0]||"")}" placeholder="方案名稱"><input class="v1" value="${esc(v[1]||"")}" placeholder="約期(月)"></div>
     <div class="ge"><input class="v2" value="${esc(v[2]||"")}" placeholder="上網流量"></div>
     <div class="ge"><input class="v3" value="${esc(v[3]||"")}" placeholder="通話優惠"></div>
-    <div class="ge"><input class="v4" value="${esc(v[4]||"")}" placeholder="購機金"><input class="v5" value="${esc(v[5]||"")}" placeholder="專案價"><button class="mv" title="上移" onclick="moveUp(this)">↑</button><button class="del" onclick="this.closest('.row-edit').remove()">刪除</button></div>
+    <div class="ge"><input class="v4" value="${esc(v[4]||"")}" placeholder="購機金"><input class="v5" value="${esc(v[5]||"")}" placeholder="專案價"><button class="mv" title="上移" onclick="moveUp(this)">↑</button><button class="mv" title="下移" onclick="moveDown(this)">↓</button><button class="del" onclick="this.closest('.row-edit').remove()">刪除</button></div>
   </div>`;
 }
 function grpPrice(g){
-  return `<div class="grp"><div class="grp-head"><input class="g-name" value="${esc(g.brand||"")}" placeholder="品牌名稱"><button class="mv" title="整組上移" onclick="moveUp(this)">↑</button><button class="grp-del" onclick="if(confirm('刪除整組?'))this.closest('.grp').remove()">刪整組</button></div>
+  return `<div class="grp"><div class="grp-head"><input class="g-name" value="${esc(g.brand||"")}" placeholder="品牌名稱"><button class="mv" title="整組上移" onclick="moveUp(this)">↑</button><button class="mv" title="整組下移" onclick="moveDown(this)">↓</button><button class="grp-del" onclick="if(confirm('刪除整組?'))this.closest('.grp').remove()">刪整組</button></div>
     <div class="fld"><label>備註(可空白)</label><input class="g-note" value="${esc(g.note||"")}"></div>
     <button class="addrow addrow-top" onclick="(function(b){b.nextElementSibling.insertAdjacentHTML('afterbegin', row2('','','商品名稱','售價'));var f=b.nextElementSibling.querySelector('.v0');if(f)f.focus();})(this)">＋ 新增商品</button>
     <div class="g-rows">${(g.rows||[]).map(r=>row2(r[0],r[1],"商品名稱","售價")).join("")}</div></div>`;
 }
 function grpRecycle(g){
-  return `<div class="grp"><div class="grp-head"><input class="g-name" value="${esc(g.brand||"")}" placeholder="分類名稱"><button class="mv" title="整組上移" onclick="moveUp(this)">↑</button><button class="grp-del" onclick="if(confirm('刪除整組?'))this.closest('.grp').remove()">刪整組</button></div>
+  return `<div class="grp"><div class="grp-head"><input class="g-name" value="${esc(g.brand||"")}" placeholder="分類名稱"><button class="mv" title="整組上移" onclick="moveUp(this)">↑</button><button class="mv" title="整組下移" onclick="moveDown(this)">↓</button><button class="grp-del" onclick="if(confirm('刪除整組?'))this.closest('.grp').remove()">刪整組</button></div>
     <div class="g-rows">${(g.rows||[]).map(r=>row2(r[0],r[1],"型號","折抵價")).join("")}</div>
     <button class="addrow" onclick="this.previousElementSibling.insertAdjacentHTML('beforeend', row2('','','型號','折抵價'))">＋ 新增型號</button></div>`;
 }
@@ -1310,20 +1310,20 @@ function grpSvc(s){
     <div class="fld" style="margin:0;"><label>按鈕連結</label><input class="svc-href" value="${esc(s.href||"")}" placeholder="#pricing 或 @LINE"></div></div></div>`;
 }
 function grpStock(g){
-  return `<div class="grp"><div class="grp-head"><input class="g-name" value="${esc(g.series||"")}" placeholder="系列名稱(例:iPhone 15 系列)"><button class="mv" title="整組上移" onclick="moveUp(this)">↑</button><button class="grp-del" onclick="if(confirm('刪除整組?'))this.closest('.grp').remove()">刪整組</button></div>
+  return `<div class="grp"><div class="grp-head"><input class="g-name" value="${esc(g.series||"")}" placeholder="系列名稱(例:iPhone 15 系列)"><button class="mv" title="整組上移" onclick="moveUp(this)">↑</button><button class="mv" title="整組下移" onclick="moveDown(this)">↓</button><button class="grp-del" onclick="if(confirm('刪除整組?'))this.closest('.grp').remove()">刪整組</button></div>
     <div class="g-rows">${(g.items||[]).map(r=>row3(r[0],r[1],r[2],"機型與規格","電池","盒裝/備註")).join("")}</div>
     <button class="addrow" onclick="this.previousElementSibling.insertAdjacentHTML('beforeend', row3('','','','機型與規格','電池','盒裝/備註'))">＋ 新增機器</button></div>`;
 }
 function grpRepair(g){
   const hds=(g.headers||[]).map((h,i)=>`<input class="hd" value="${esc(h)}" placeholder="欄位${i+1}">`).join("");
-  return `<div class="grp"><div class="grp-head"><input class="g-name" value="${esc(g.title||"")}" placeholder="系列名稱"><button class="mv" title="整組上移" onclick="moveUp(this)">↑</button><button class="grp-del" onclick="if(confirm('刪除整組?'))this.closest('.grp').remove()">刪整組</button></div>
+  return `<div class="grp"><div class="grp-head"><input class="g-name" value="${esc(g.title||"")}" placeholder="系列名稱"><button class="mv" title="整組上移" onclick="moveUp(this)">↑</button><button class="mv" title="整組下移" onclick="moveDown(this)">↓</button><button class="grp-del" onclick="if(confirm('刪除整組?'))this.closest('.grp').remove()">刪整組</button></div>
     <div class="fld"><label>欄位標題(第一欄是維修項目,其餘為機型)</label><div class="hd-row">${hds}</div></div>
     <div class="g-rows">${(g.rows||[]).map(r=>rowRep(r,g.headers)).join("")}</div>
     <button class="addrow" onclick="addRepRow(this)">＋ 新增維修項目</button></div>`;
 }
 function addRepRow(btn){ const grp=btn.closest(".grp"); const headers=[...grp.querySelectorAll(".hd")].map(i=>i.value); btn.previousElementSibling.insertAdjacentHTML("beforeend", rowRep([], headers)); }
 function grpCarrier(c){
-  return `<div class="grp"><div class="grp-head"><input class="g-name" value="${esc(c.name||"")}" placeholder="電信名稱"><button class="mv" title="整組上移" onclick="moveUp(this)">↑</button><button class="grp-del" onclick="if(confirm('刪除整組?'))this.closest('.grp').remove()">刪整組</button></div>
+  return `<div class="grp"><div class="grp-head"><input class="g-name" value="${esc(c.name||"")}" placeholder="電信名稱"><button class="mv" title="整組上移" onclick="moveUp(this)">↑</button><button class="mv" title="整組下移" onclick="moveDown(this)">↓</button><button class="grp-del" onclick="if(confirm('刪除整組?'))this.closest('.grp').remove()">刪整組</button></div>
     <div class="fld"><label>副標(例:攜碼/新辦/續約,皆可申辦)</label><input class="g-note" value="${esc(c.note||"")}"></div>
     <div class="fld"><label>4G 方案</label></div>
     <div class="g4-rows">${(c.g4||[]).map(rowPlan).join("")}</div>
@@ -1401,7 +1401,7 @@ function bnListHTML(){
       <input value="${esc(s.label||"")}" placeholder="說明(給搜尋引擎與讀屏,可留空)" oninput="bnLabel(${i},this.value)">
     </div>
     <div class="wi-btns">
-      <button class="mv" onclick="bnUp(${i})" title="上移">↑</button>
+      <button class="mv" onclick="bnUp(${i})" title="上移">↑</button><button class="mv" onclick="bnDown(${i})" title="下移">↓</button>
       <label class="wi-rep">換圖<input type="file" accept="image/*" style="display:none" onchange="bnReplace(${i},event)"></label>
       <button class="wi-del" onclick="bnDel(${i})">刪除</button>
     </div>
@@ -1411,6 +1411,7 @@ function bnRefresh(){ const el=document.getElementById("bnList"); if(el) el.inne
 function bnHref(i,v){ if(BN_EDIT&&BN_EDIT[i]) BN_EDIT[i].href=v; }
 function bnLabel(i,v){ if(BN_EDIT&&BN_EDIT[i]) BN_EDIT[i].label=v; }
 function bnUp(i){ if(!BN_EDIT||i<=0) return; const t=BN_EDIT[i-1]; BN_EDIT[i-1]=BN_EDIT[i]; BN_EDIT[i]=t; ADMIN_DIRTY=true; bnRefresh(); }
+function bnDown(i){ if(!BN_EDIT||i>=BN_EDIT.length-1) return; const t=BN_EDIT[i+1]; BN_EDIT[i+1]=BN_EDIT[i]; BN_EDIT[i]=t; ADMIN_DIRTY=true; bnRefresh(); }
 function bnDel(i){ if(!confirm("刪除這張輪播圖?")) return; BN_EDIT.splice(i,1); ADMIN_DIRTY=true; bnRefresh(); }
 function bnAdd(e){
   if(BN_EDIT===null) BN_EDIT=JSON.parse(JSON.stringify(DATA.slides||[]));
@@ -1763,6 +1764,15 @@ function moveUp(btn){
   const prev=node.previousElementSibling;
   if(prev && prev.classList && (prev.classList.contains("row-edit")||prev.classList.contains("grp"))){
     node.parentNode.insertBefore(node,prev); ADMIN_DIRTY=true;
+    node.style.background="#1c2733"; setTimeout(()=>{node.style.background="";},350);
+  }
+}
+function moveDown(btn){
+  const node = btn.closest(".grp-head") ? btn.closest(".grp") : btn.closest(".row-edit");
+  if(!node) return;
+  const next=node.nextElementSibling;
+  if(next && next.classList && (next.classList.contains("row-edit")||next.classList.contains("grp"))){
+    node.parentNode.insertBefore(next,node); ADMIN_DIRTY=true;
     node.style.background="#1c2733"; setTimeout(()=>{node.style.background="";},350);
   }
 }
