@@ -909,6 +909,30 @@ function bannerSliderHTML(){
 }
 
 
+// 首頁主打卡片:依型號+容量,去新機報價表(newPrices)查即時價格
+function lookupPrice(model, spec){
+  const d=DATA;
+  if(!d.newPrices) return "";
+  // 把容量正規化: "256GB"->"256G", "1TB"->"1TB"
+  const cap = String(spec||"").replace(/GB/i,"G").replace(/\s/g,"").trim();
+  const wantKey = (model+" "+cap).replace(/\s+/g," ").trim();
+  // 遍歷所有品牌的所有列,找型號名稱匹配的
+  for(const b of d.newPrices){
+    for(const row of (b.rows||[])){
+      const name = String(row[0]||"").replace(/\s+/g," ").trim();
+      // 完全匹配 "iPhone 17 256G"
+      if(name === wantKey) return row[1]||"";
+    }
+  }
+  // 找不到完全匹配,嘗試寬鬆匹配(型號開頭 + 含容量)
+  for(const b of d.newPrices){
+    for(const row of (b.rows||[])){
+      const name = String(row[0]||"");
+      if(name.indexOf(model)===0 && name.replace(/\s/g,"").indexOf(cap)>=0) return row[1]||"";
+    }
+  }
+  return ""; // 查不到就空白
+}
 function pageHome(){
   const d=DATA; const banners2=d.banners.concat(d.banners);
   return `
@@ -940,7 +964,7 @@ function pageHome(){
       <div class="section-head"><div><span class="section-num">本週主打</span><h2 class="section-title">熱門新機，現貨供應</h2></div>
         <a class="dc-link" href="#pricing" style="color:var(--signal);">看完整報價 →</a></div>
       <div class="hot-grid">
-        ${d.newPhones.map(p=>`<a class="model-card" href="#pricing"><div class="ph">${esc(p.model)}</div><div class="px">${esc(p.spec)}</div><div class="pr">${esc(p.price)}</div></a>`).join("")}
+        ${d.newPhones.map(p=>{const livePrice=lookupPrice(p.model,p.spec)||p.price;return `<a class="model-card" href="#pricing"><div class="ph">${esc(p.model)}</div><div class="px">${esc(p.spec)}</div><div class="pr">${esc(livePrice)}</div></a>`;}).join("")}
       </div>
     </div>
   </section>`:""}
